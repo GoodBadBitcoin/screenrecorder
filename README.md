@@ -1,20 +1,17 @@
 # Screen Recorder
 
-Eigener Bildschirmrecorder mit pixelgenauer Bereichsauswahl, Audio-Aufnahme und GUI.
+Custom screen recorder with pixel-exact region selection, audio capture, and GUI.
 
-## Voraussetzungen
+## Requirements
 
 - **Python 3.9+** — [python.org/downloads](https://www.python.org/downloads/)
-- **ffmpeg** — für Video-Encoding, muss im PATH liegen
-  ```
-  winget install ffmpeg
-  ```
+- **ffmpeg** — for video encoding, must be in PATH
 
 ## Installation & Start
 
-Doppelklick auf `start.bat` — installiert automatisch alle Dependencies und startet die App.
+Double-click `install.bat` to install all dependencies (including ffmpeg), then run `start.bat` to launch.
 
-Oder manuell:
+Or manually:
 
 ```bash
 pip install -r requirements.txt
@@ -23,35 +20,37 @@ python screen_recorder.py
 
 ## Features
 
-| Feature | Beschreibung |
+| Feature | Description |
 |---------|-------------|
-| **Pixelgenaue Größe** | Breite/Höhe numerisch eingeben (z.B. 1920×1080) |
-| **Drag-Overlay** | Bereich per Maus auf abgedunkeltem Screenshot auswählen |
-| **Audio** | Mikrofon-Aufnahme mit Geräteauswahl |
+| **Pixel-exact size** | Enter width/height numerically (e.g. 1920×1080) |
+| **Drag overlay** | Select area by dragging on a darkened screenshot |
+| **Audio** | Microphone recording with device selection |
 | **FPS** | 15 / 24 / 30 / 60 fps |
-| **Formate** | MP4, MKV, AVI |
-| **Dark UI** | Übersichtliche GUI mit Status-Anzeige |
+| **Formats** | MP4, MKV, AVI |
+| **Language** | Switch between English and German |
+| **Dark UI** | Clean GUI with status display |
 
-## Architektur
+## Architecture
 
 ```
 screen_recorder.py
-├── RegionSelector    — Fullscreen-Overlay zum Bereich aufziehen
-├── AudioRecorder     — Mic-Aufnahme via sounddevice → WAV
-├── VideoRecorder     — mss Screen-Capture → ffmpeg Pipe (libx264)
-└── RecorderApp       — tkinter GUI + Orchestrierung
+├── RegionSelector    — Fullscreen overlay for drawing a capture area
+├── RegionOverlay     — Draggable/resizable border showing the recording region
+├── AudioRecorder     — Mic capture via sounddevice → WAV
+├── VideoRecorder     — mss screen capture → ffmpeg pipe (libx264)
+└── RecorderApp       — tkinter GUI + orchestration
 ```
 
-**Recording-Pipeline:**
-1. `mss` grabbt Frames im gewählten Bereich mit Ziel-FPS
-2. Raw BGRA-Frames werden per stdin-Pipe an `ffmpeg` gestreamt
-3. Audio wird parallel via `sounddevice` in eine temp WAV geschrieben
-4. Nach Stopp: Video + Audio werden per `ffmpeg -c:v copy` zusammengemuxed
+**Recording pipeline:**
+1. `mss` grabs frames in the selected region at the target FPS
+2. Raw BGRA frames are piped via stdin to `ffmpeg`
+3. Audio is recorded in parallel via `sounddevice` into a temp WAV
+4. After stop: video + audio are muxed with `ffmpeg -c:v copy`
 
-## System-Audio aufnehmen
+## Recording System Audio
 
-Für System-Audio (Desktop-Sound) unter Windows:
+To capture desktop audio on Windows:
 
-1. **Stereo Mix aktivieren:** Rechtsklick auf Lautsprecher-Icon → Sounds → Aufnahme → Rechtsklick → "Deaktivierte Geräte anzeigen" → "Stereo Mix" aktivieren
-2. Oder **Virtual Audio Cable** installieren (z.B. VB-Audio Virtual Cable)
-3. Das Gerät dann im Recorder als Audio-Quelle auswählen
+1. **Enable Stereo Mix:** Right-click speaker icon → Sounds → Recording → Right-click → "Show Disabled Devices" → Enable "Stereo Mix"
+2. Or install **Virtual Audio Cable** (e.g. VB-Audio Virtual Cable)
+3. Select the device as audio source in the recorder
